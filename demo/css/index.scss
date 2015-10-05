@@ -1,9 +1,9 @@
-$h: 500px;
+$h: 400px;
 
 #roll {
 
   width: 500px;
-  height: 480px;
+  height: $h;
 
 
   position: relative;
@@ -37,23 +37,19 @@ $h: 500px;
     height: $h;
 
     position: absolute;
-    top: -$h - 10;
+    top: $h;
     left: 0;
 
     background: rgba(244, 0, 0, .1);
 
     transition: top .5s;
 
-    &.current {
-      top: 0;
-    }
-
     &.prev {
-      top: -$h - 10;
+      top: -$h;
     }
 
     &.next {
-      top: $h+10;
+      top: $h;
     }
 
     &.curr {

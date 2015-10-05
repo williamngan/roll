@@ -2,18 +2,29 @@ var EventEmitter = require('events').EventEmitter;
 
 class Roll extends EventEmitter {
 
-  constructor( viewHeight ) {
+  /**
+   * Create a new Roll.
+   * @param viewSize viewport size (single dimension)
+   */
+  constructor( viewSize ) {
     super();
 
+    this.viewport = viewSize;
+
+    // store the steps object {y1, y2, size, pad}, See Roll.chunk
     this.steps = [];
 
-    this.p = 0;
-    this.viewport = viewHeight;
-    this.current = 0;
-    this.last = -1;
+    this.pos = 0; // current position
+    this.current = 0; // current step
+    this.last = -1; // last step
   }
 
 
+  /**
+   * Add a step object. You can also use Roll.chunk() static helper function to create a step object easily.
+   * @param s an object with {y1, y2, size, pad} properties, or an array of steps object
+   * @returns {Roll}
+   */
   addStep(s) {
     if (Array.isArray( s )) {
       this.steps = this.steps.concat( s );
@@ -32,6 +43,10 @@ class Roll extends EventEmitter {
   }
 
 
+  /**
+   * Calculate and return current step. When padding > 0, step will be -1 when current progress is on the padding area. This allows you to check progress against padding.
+   * @returns {number}
+   */
   getCurrent() {
     for (var i=0; i<this.steps.length; i++) {
       var st = this.steps[i];
@@ -43,26 +58,34 @@ class Roll extends EventEmitter {
     return -1;
   }
 
-
-  getCurrentProgress( p ) {
-    var len = this.steps.length-1;
+  /**
+   * Get current progress within the current step
+   * @returns return 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
+   */
+  getCurrentProgress() {
     var curr = this.steps[ this.current ];
-    var next = (this.current == len) ? {p1: this.steps[len].p2 + this.steps[len].pad} : this.steps[this.current+1];
-    return (p-curr.p1) / (next.p1-curr.p1) - this.current;
+    return 1 - (curr.p2 / curr.size);
   }
 
 
-
+  /**
+   * Get total height of the pane (including padding)
+   * @returns {*}
+   */
   getHeight() {
     return this.steps.reduce( (a,b) => a+b.size+b.pad, 0 );
   }
 
 
-
+  /**
+   * Move the roll. This will emit two events `roll(step, progress)` and `step(curr, last)`
+   * @param pos new position
+   * @returns {Roll}
+   */
   move( pos ) {
-    var last = this.p;
-    this.p = -pos;
-    var diff = this.p - last;
+    var last = this.pos;
+    this.pos = -pos;
+    var diff = this.pos - last;
 
     for (var s of this.steps) {
       s.p1 += diff;
@@ -70,7 +93,7 @@ class Roll extends EventEmitter {
     }
 
     var curr = this.getCurrent();
-    this.emit("roll", curr, this.getCurrentProgress(pos) );
+    this.emit("roll", curr, this.getCurrentProgress() );
 
     if (curr != this.last && curr >= 0) {
       this.emit("step", curr, this.last );
@@ -81,6 +104,12 @@ class Roll extends EventEmitter {
   }
 
 
+  /**
+   * A convenient static function to create a step object
+   * @param size chunk size
+   * @param pad optional padding (default to 0)
+   * @returns {{p1: number, p2: *, size: *, pad: number}}
+   */
   static chunk( size, pad=0) {
     return {
       p1: 0,
@@ -90,8 +119,17 @@ class Roll extends EventEmitter {
     }
   }
 
-  static stepName( step, currID, prev="prev", next="next", match="curr") {
-    return (step === currID) ? match : ( (step < currID) ? prev : next );
+  /**
+   * A convenient static function to compare a step with current step, and transform it to a name
+   * @param step the step to check
+   * @param currStep current step
+   * @param prev the name if step is < currStep. Defaults to "prev"
+   * @param next the name if step is > currStep. Defaults to "next"
+   * @param match the name if step = currStep. Defaults to "curr"
+   * @returns {string}
+   */
+  static stepName( step, currStep, prev="prev", next="next", match="curr") {
+    return (step === currStep) ? match : ( (step < currStep) ? prev : next );
   }
 
 }

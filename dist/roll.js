@@ -317,18 +317,31 @@ var EventEmitter = require('events').EventEmitter;
 var Roll = (function (_EventEmitter) {
   _inherits(Roll, _EventEmitter);
 
-  function Roll(viewHeight) {
+  /**
+   * Create a new Roll.
+   * @param viewSize viewport size (single dimension)
+   */
+
+  function Roll(viewSize) {
     _classCallCheck(this, Roll);
 
     _get(Object.getPrototypeOf(Roll.prototype), "constructor", this).call(this);
 
+    this.viewport = viewSize;
+
+    // store the steps object {y1, y2, size, pad}, See Roll.chunk
     this.steps = [];
 
-    this.p = 0;
-    this.viewport = viewHeight;
-    this.current = 0;
-    this.last = -1;
+    this.pos = 0; // current position
+    this.current = 0; // current step
+    this.last = -1; // last step
   }
+
+  /**
+   * Add a step object. You can also use Roll.chunk() static helper function to create a step object easily.
+   * @param s an object with {y1, y2, size, pad} properties, or an array of steps object
+   * @returns {Roll}
+   */
 
   _createClass(Roll, [{
     key: "addStep",
@@ -369,6 +382,11 @@ var Roll = (function (_EventEmitter) {
 
       return this;
     }
+
+    /**
+     * Calculate and return current step. When padding > 0, step will be -1 when current progress is on the padding area. This allows you to check progress against padding.
+     * @returns {number}
+     */
   }, {
     key: "getCurrent",
     value: function getCurrent() {
@@ -381,14 +399,22 @@ var Roll = (function (_EventEmitter) {
       }
       return -1;
     }
+
+    /**
+     * Get current progress within the current step
+     * @returns return 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
+     */
   }, {
     key: "getCurrentProgress",
-    value: function getCurrentProgress(p) {
-      var len = this.steps.length - 1;
+    value: function getCurrentProgress() {
       var curr = this.steps[this.current];
-      var next = this.current == len ? { p1: this.steps[len].p2 + this.steps[len].pad } : this.steps[this.current + 1];
-      return (p - curr.p1) / (next.p1 - curr.p1) - this.current;
+      return 1 - curr.p2 / curr.size;
     }
+
+    /**
+     * Get total height of the pane (including padding)
+     * @returns {*}
+     */
   }, {
     key: "getHeight",
     value: function getHeight() {
@@ -396,12 +422,18 @@ var Roll = (function (_EventEmitter) {
         return a + b.size + b.pad;
       }, 0);
     }
+
+    /**
+     * Move the roll. This will emit two events `roll(step, progress)` and `step(curr, last)`
+     * @param pos new position
+     * @returns {Roll}
+     */
   }, {
     key: "move",
     value: function move(pos) {
-      var last = this.p;
-      this.p = -pos;
-      var diff = this.p - last;
+      var last = this.pos;
+      this.pos = -pos;
+      var diff = this.pos - last;
 
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
@@ -430,7 +462,7 @@ var Roll = (function (_EventEmitter) {
       }
 
       var curr = this.getCurrent();
-      this.emit("roll", curr, this.getCurrentProgress(pos));
+      this.emit("roll", curr, this.getCurrentProgress());
 
       if (curr != this.last && curr >= 0) {
         this.emit("step", curr, this.last);
@@ -439,6 +471,13 @@ var Roll = (function (_EventEmitter) {
 
       return this;
     }
+
+    /**
+     * A convenient static function to create a step object
+     * @param size chunk size
+     * @param pad optional padding (default to 0)
+     * @returns {{p1: number, p2: *, size: *, pad: number}}
+     */
   }], [{
     key: "chunk",
     value: function chunk(size) {
@@ -451,14 +490,24 @@ var Roll = (function (_EventEmitter) {
         pad: pad
       };
     }
+
+    /**
+     * A convenient static function to compare a step with current step, and transform it to a name
+     * @param step the step to check
+     * @param currStep current step
+     * @param prev the name if step is < currStep. Defaults to "prev"
+     * @param next the name if step is > currStep. Defaults to "next"
+     * @param match the name if step = currStep. Defaults to "curr"
+     * @returns {string}
+     */
   }, {
     key: "stepName",
-    value: function stepName(step, currID) {
+    value: function stepName(step, currStep) {
       var prev = arguments.length <= 2 || arguments[2] === undefined ? "prev" : arguments[2];
       var next = arguments.length <= 3 || arguments[3] === undefined ? "next" : arguments[3];
       var match = arguments.length <= 4 || arguments[4] === undefined ? "curr" : arguments[4];
 
-      return step === currID ? match : step < currID ? prev : next;
+      return step === currStep ? match : step < currStep ? prev : next;
     }
   }]);
 
