@@ -60,7 +60,7 @@ class Roll extends EventEmitter {
 
   /**
    * Get current progress within the current step
-   * @returns return 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
+   * @returns 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
    */
   getCurrentProgress() {
     var curr = this.steps[ this.current ];
@@ -78,7 +78,7 @@ class Roll extends EventEmitter {
 
 
   /**
-   * Move the roll. This will emit two events `roll(step, progress)` and `step(curr, last)`
+   * Move the roll. This will emit two events `roll(step, currProgress, totalProgress)` and `step(curr, last)`
    * @param pos new position
    * @returns {Roll}
    */
@@ -93,7 +93,8 @@ class Roll extends EventEmitter {
     }
 
     var curr = this.getCurrent();
-    this.emit("roll", curr, this.getCurrentProgress() );
+    var progress = this.getCurrentProgress();
+    this.emit("roll", curr, progress, this.current+Math.min( 1, Math.max(0, progress)) );
 
     if (curr != this.last && curr >= 0) {
       this.emit("step", curr, this.last );

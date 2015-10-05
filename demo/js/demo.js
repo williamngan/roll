@@ -30,9 +30,10 @@
     }
   });
 
-  roll.on("roll", function(step, progress) {
+  roll.on("roll", function(step, progress, total) {
     var curr = (step >= 0) ? step : "(padding)";
-    document.querySelector("#progress").textContent = "Step "+curr +" at "+ Math.floor(progress * 100) + "%";
+    var str = "Step "+curr +" at "+ Math.floor(progress * 100) + "% (total: "+total+")";
+    document.querySelector("#progress").textContent = str;
   });
 
 
