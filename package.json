@@ -18,7 +18,7 @@
     "vinyl-buffer": "^1.0.0",
     "watchify": "^3.4.0",
     "babelify": "6.3.0",
-    "event-emitter": "^0.3.4"
+    "events": "^1.1.0"
   },
   "main": "dist/js/roll.js",
   "directories": {

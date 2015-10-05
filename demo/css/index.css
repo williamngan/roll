@@ -1,21 +1,23 @@
-#steps {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0; }
-
-.step {
-  width: 100%;
-  height: 100vh;
-  position: fixed;
-  top: -110vh;
-  left: 0;
-  background: rgba(244, 0, 0, 0.1);
-  transition: top .5s; }
-  .step.current {
-    top: 0; }
-  .step.prev {
-    top: -110vh; }
-  .step.next {
-    top: 110vh; }
+#wrapper {
+  position: relative;
+  width: 500px;
+  height: 600px;
+  overflow: auto;
+  border: 1px solid #f00; }
+  #wrapper #steps {
+    width: 10px;
+    background: #999; }
+  #wrapper .step {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: rgba(244, 0, 0, 0.1);
+    transition: top .5s; }
+    #wrapper .step.current {
+      top: 0; }
+    #wrapper .step.prev {
+      top: -110%; }
+    #wrapper .step.next {
+      top: 110%; }

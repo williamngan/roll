@@ -1,29 +1,40 @@
-#steps {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-}
+#wrapper {
 
-.step {
-  width: 100%;
-  height: 100vh;
+  position: relative;
+  width: 500px;
+  height: 600px;
+  overflow: auto;
 
-  position: fixed;
-  top: -110vh;
-  left: 0;
+  border: 1px solid #f00;
 
-  background: rgba(244,0,0,.1);
-
-  transition: top .5s;
-
-  &.current {
-    top: 0;
+  #steps {
+    width: 10px;
+    background: #999;
   }
 
-  &.prev {
-    top: -110vh;
+  .step {
+    width: 100%;
+    height: 100%;
+
+    position: absolute;
+    top: -100%;
+    left: 0;
+
+    background: rgba(244, 0, 0, .1);
+
+    transition: top .5s;
+
+    &.current {
+      top: 0;
+    }
+
+    &.prev {
+      top: -110%;
+    }
+
+    &.next {
+      top: 110%;
+    }
   }
 
-  &.next {
-    top: 110vh;
-  }
 }

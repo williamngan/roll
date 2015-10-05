@@ -1,8 +1,8 @@
-var EventEmitter = require("event-emitter");
+var EventEmitter = require('events').EventEmitter;
 
 class Roll extends EventEmitter {
 
-  constructor( steps, viewHeight ) {
+  constructor( viewHeight ) {
     super();
 
     this.steps = [];
@@ -11,6 +11,17 @@ class Roll extends EventEmitter {
     this.viewport = viewHeight;
     this.current = 0;
   }
+
+
+  addStep(s) {
+    if (Array.isArray( s )) {
+      this.steps = this.steps.concat( s );
+    } else {
+      this.steps.push( s );
+    }
+    return this;
+  }
+
 
   getCurrent() {
     for (var i=0; i<this.steps.length; i++) {
@@ -32,6 +43,16 @@ class Roll extends EventEmitter {
   }
 
 
+
+  getHeight() {
+    var h = 0;
+    for (var s of this.steps) {
+      h += (s.size + s.pad);
+    }
+    return h;
+  }
+
+
   move( y ) {
     var last = this.y;
     this.y = -y;
@@ -42,7 +63,11 @@ class Roll extends EventEmitter {
       s.y2 = s.y1 + s.size;
     }
 
+    this.emit("roll", this.getCurrent(), this.getCurrentProgress(y) );
+
+    return this;
   }
+
 
   static chunk( size, pad=0) {
     return {
@@ -54,3 +79,7 @@ class Roll extends EventEmitter {
   }
 
 }
+
+
+module.exports = Roll;
+if (window) window.Roll = Roll;
