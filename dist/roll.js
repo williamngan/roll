@@ -306,7 +306,7 @@ function isUndefined(arg) {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x5, _x6, _x7) { var _again = true; _function: while (_again) { var object = _x5, property = _x6, receiver = _x7; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x5 = parent; _x6 = property; _x7 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -324,9 +324,10 @@ var Roll = (function (_EventEmitter) {
 
     this.steps = [];
 
-    this.y = 0;
+    this.p = 0;
     this.viewport = viewHeight;
     this.current = 0;
+    this.last = -1;
   }
 
   _createClass(Roll, [{
@@ -337,41 +338,19 @@ var Roll = (function (_EventEmitter) {
       } else {
         this.steps.push(s);
       }
-      return this;
-    }
-  }, {
-    key: "getCurrent",
-    value: function getCurrent() {
-      for (var i = 0; i < this.steps.length; i++) {
-        var st = this.steps[i];
-        if (st.y1 < this.viewport && st.y2 > this.viewport) {
-          this.current = i;
-          return i;
-        }
-      }
-      return -1;
-    }
-  }, {
-    key: "getCurrentProgress",
-    value: function getCurrentProgress(p) {
-      var len = this.steps.length - 1;
-      var curr = this.steps[this.current];
-      var next = this.current == len ? { y1: this.steps[len].y2 + this.steps[len].pad } : this.steps[this.current + 1];
-      return (p - curr.y1) / (next.y1 - curr.y1) - this.current;
-    }
-  }, {
-    key: "getHeight",
-    value: function getHeight() {
-      var h = 0;
+
+      var d = null;
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
         for (var _iterator = this.steps[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var s = _step.value;
+          var st = _step.value;
 
-          h += s.size + s.pad;
+          st.p1 = d == null ? st.p1 : d;
+          st.p2 = st.p1 + st.size;
+          d = st.p2 + st.pad;
         }
       } catch (err) {
         _didIteratorError = true;
@@ -388,14 +367,41 @@ var Roll = (function (_EventEmitter) {
         }
       }
 
-      return h;
+      return this;
+    }
+  }, {
+    key: "getCurrent",
+    value: function getCurrent() {
+      for (var i = 0; i < this.steps.length; i++) {
+        var st = this.steps[i];
+        if (st.p1 >= -this.viewport && st.p2 <= this.viewport) {
+          this.current = i;
+          return i;
+        }
+      }
+      return -1;
+    }
+  }, {
+    key: "getCurrentProgress",
+    value: function getCurrentProgress(p) {
+      var len = this.steps.length - 1;
+      var curr = this.steps[this.current];
+      var next = this.current == len ? { p1: this.steps[len].p2 + this.steps[len].pad } : this.steps[this.current + 1];
+      return (p - curr.p1) / (next.p1 - curr.p1) - this.current;
+    }
+  }, {
+    key: "getHeight",
+    value: function getHeight() {
+      return this.steps.reduce(function (a, b) {
+        return a + b.size + b.pad;
+      }, 0);
     }
   }, {
     key: "move",
-    value: function move(y) {
-      var last = this.y;
-      this.y = -y;
-      var diff = this.y - last;
+    value: function move(pos) {
+      var last = this.p;
+      this.p = -pos;
+      var diff = this.p - last;
 
       var _iteratorNormalCompletion2 = true;
       var _didIteratorError2 = false;
@@ -405,8 +411,8 @@ var Roll = (function (_EventEmitter) {
         for (var _iterator2 = this.steps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
           var s = _step2.value;
 
-          s.y1 += diff;
-          s.y2 = s.y1 + s.size;
+          s.p1 += diff;
+          s.p2 = s.p1 + s.size;
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -423,7 +429,13 @@ var Roll = (function (_EventEmitter) {
         }
       }
 
-      this.emit("roll", this.getCurrent(), this.getCurrentProgress(y));
+      var curr = this.getCurrent();
+      this.emit("roll", curr, this.getCurrentProgress(pos));
+
+      if (curr != this.last && curr >= 0) {
+        this.emit("step", curr, this.last);
+        this.last = curr;
+      }
 
       return this;
     }
@@ -433,11 +445,20 @@ var Roll = (function (_EventEmitter) {
       var pad = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
 
       return {
-        y1: 0,
-        y2: size,
+        p1: 0,
+        p2: size,
         size: size,
         pad: pad
       };
+    }
+  }, {
+    key: "stepName",
+    value: function stepName(step, currID) {
+      var prev = arguments.length <= 2 || arguments[2] === undefined ? "prev" : arguments[2];
+      var next = arguments.length <= 3 || arguments[3] === undefined ? "next" : arguments[3];
+      var match = arguments.length <= 4 || arguments[4] === undefined ? "curr" : arguments[4];
+
+      return step === currID ? match : step < currID ? prev : next;
     }
   }]);
 

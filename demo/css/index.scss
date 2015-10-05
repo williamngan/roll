@@ -1,23 +1,43 @@
-#wrapper {
+$h: 500px;
+
+#roll {
+
+  width: 500px;
+  height: 480px;
+
 
   position: relative;
-  width: 500px;
-  height: 600px;
-  overflow: auto;
 
-  border: 1px solid #f00;
+
+  #wrapper {
+    overflow: auto;
+    border: 1px solid #f00;
+    width: 100%;
+    height: 100%;
+
+    #pane {
+      position: relative;
+    }
+  }
 
   #steps {
-    width: 10px;
-    background: #999;
+    position: absolute;
+    overflow: hidden;
+    top: 0; left: 0;
+    width: 90%;
+    height: 100%;
+    //top: 0; bottom: 0; left: 0; right: 0;
+    //
+    //overflow-y: hidden;
+    //overflow-x: visible;
   }
 
   .step {
     width: 100%;
-    height: 100%;
+    height: $h;
 
     position: absolute;
-    top: -100%;
+    top: -$h - 10;
     left: 0;
 
     background: rgba(244, 0, 0, .1);
@@ -29,11 +49,15 @@
     }
 
     &.prev {
-      top: -110%;
+      top: -$h - 10;
     }
 
     &.next {
-      top: 110%;
+      top: $h+10;
+    }
+
+    &.curr {
+      top: 0;
     }
   }
 
