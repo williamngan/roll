@@ -1,0 +1,29 @@
+#steps {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+.step {
+  width: 100%;
+  height: 100vh;
+
+  position: fixed;
+  top: -110vh;
+  left: 0;
+
+  background: rgba(244,0,0,.1);
+
+  transition: top .5s;
+
+  &.current {
+    top: 0;
+  }
+
+  &.prev {
+    top: -110vh;
+  }
+
+  &.next {
+    top: 110vh;
+  }
+}

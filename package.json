@@ -1,0 +1,46 @@
+{
+  "name": "roll",
+  "version": "0.1.0",
+  "description": "Roll with scroll - a simple library to track scrolling",
+  "author": "William Ngan",
+  "devDependencies": {
+    "event-stream": "^3.3.0",
+    "gulp": "^3.8.10",
+    "gulp-util": "^3.0.1",
+    "gulp-concat": "^2.4.3",
+    "gulp-rename": "^1.2.0",
+    "gulp-insert": "^0.4.0",
+    "gulp-uglify": "^1.0.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-babel": "^5.2.0",
+    "browserify": "^11.1.0",
+    "vinyl-source-stream": "^1.1.0",
+    "vinyl-buffer": "^1.0.0",
+    "watchify": "^3.4.0",
+    "babelify": "6.3.0",
+    "event-emitter": "^0.3.4"
+  },
+  "main": "dist/js/roll.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/williamngan/roll.git"
+  },
+  "keywords": [
+    "animation",
+    "scroll",
+    "ui"
+  ],
+  "license": "Apache",
+  "bugs": {
+    "url": "https://github.com/williamngan/roll/issues"
+  },
+  "homepage": "https://github.com/williamngan/roll"
+}
