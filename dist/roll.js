@@ -306,7 +306,7 @@ function isUndefined(arg) {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x5, _x6, _x7) { var _again = true; _function: while (_again) { var object = _x5, property = _x6, receiver = _x7; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x5 = parent; _x6 = property; _x7 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x8, _x9, _x10) { var _again = true; _function: while (_again) { var object = _x8, property = _x9, receiver = _x10; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x8 = parent; _x9 = property; _x10 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -335,6 +335,8 @@ var Roll = (function (_EventEmitter) {
     this.pos = 0; // current position
     this.current = 0; // current step
     this.last = -1; // last step
+
+    this.movingInterval = -1;
   }
 
   /**
@@ -380,6 +382,7 @@ var Roll = (function (_EventEmitter) {
         }
       }
 
+      console.log(this.steps);
       return this;
     }
   }, {
@@ -479,6 +482,35 @@ var Roll = (function (_EventEmitter) {
     }
 
     /**
+     * Animated scrolling a DOM element
+     * @param index step index
+     * @param scrollPane a DOM element with scrolling (overflow-y).
+     * @param speed optional speed of animated scroll. Defaults to 0.1. Larger is faster
+     * @param isVertical optional boolean to indicate horizontal or vertical scroll
+     */
+  }, {
+    key: "scroll",
+    value: function scroll(index, scrollPane) {
+      var _this = this;
+
+      var speed = arguments.length <= 2 || arguments[2] === undefined ? 0.1 : arguments[2];
+      var isVertical = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
+
+      if (!scrollPane || scrollPane.scrollTop == null) throw "scrollPane parameter requires a DOM element with scrollTop property";
+      clearInterval(this.movingInterval);
+      var _temp = Number.NEGATIVE_INFINITY;
+      var dir = isVertical ? "scrollTop" : "scrollLeft";
+
+      this.movingInterval = setInterval(function () {
+        var target = _this.getStepAt(index);
+        var d = (target.p1 + target.size / 4) * speed;
+        scrollPane[dir] += d;
+        if (Math.abs(d) < 1 || _temp === scrollPane[dir]) clearInterval(_this.movingInterval);
+        _temp = scrollPane[dir];
+      }, 17);
+    }
+
+    /**
      * A convenient static function to create a step object
      * @param size chunk size
      * @param pad optional padding (default to 0)
@@ -514,6 +546,46 @@ var Roll = (function (_EventEmitter) {
       var match = arguments.length <= 4 || arguments[4] === undefined ? "curr" : arguments[4];
 
       return step === currStep ? match : step < currStep ? prev : next;
+    }
+
+    /**
+     * Static helper for vertical scrolling
+     * @param viewPortID id of viewport element, eg, "#viewport"
+     * @param viewPaneID id of view pane element, eg, "#pane"
+     * @param viewClass id of each step or slide element, eg, ".step"
+     * @param pad optional padding between steps. Defaults to 0.
+     * @returns the roll instance which you can listen for "step" and "roll" event via `roll.on(...)`
+     */
+  }, {
+    key: "verticalScroller",
+    value: function verticalScroller(viewPortID, viewPaneID, viewClass) {
+      var pad = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+
+      var viewport = document.querySelector(viewPortID);
+      var viewpane = document.querySelector(viewPaneID);
+      var views = document.querySelectorAll(viewClass);
+
+      if (!viewport || !viewpane) throw "Cannot find " + viewPortID + " or " + viewPaneID + " element id.";
+      if (!viewClass) throw "Cannot find " + viewClass + " element class name";
+
+      // create roll instance based on viewport element height
+      var roll = new Roll(viewport.getBoundingClientRect().height);
+
+      // add each viewClass element as a step
+      for (var i = 0; i < views.length; i++) {
+        var rect = views[i].getBoundingClientRect();
+        roll.addStep(Roll.chunk(rect.height, pad));
+      }
+
+      // update viewpane height based on steps
+      viewpane.style.height = roll.getHeight() + "px";
+
+      // track scroll
+      viewport.addEventListener("scroll", function (evt) {
+        roll.move(viewport.scrollTop);
+      });
+
+      return roll;
     }
   }]);
 

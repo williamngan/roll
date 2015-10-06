@@ -17,6 +17,8 @@ class Roll extends EventEmitter {
     this.pos = 0; // current position
     this.current = 0; // current step
     this.last = -1; // last step
+
+    this.movingInterval = -1;
   }
 
 
@@ -39,6 +41,7 @@ class Roll extends EventEmitter {
       d = st.p2 + st.pad;
     }
 
+    console.log( this.steps );
     return this;
   }
 
@@ -111,6 +114,29 @@ class Roll extends EventEmitter {
 
 
   /**
+   * Animated scrolling a DOM element
+   * @param index step index
+   * @param scrollPane a DOM element with scrolling (overflow-y).
+   * @param speed optional speed of animated scroll. Defaults to 0.1. Larger is faster
+   * @param isVertical optional boolean to indicate horizontal or vertical scroll
+   */
+  scroll( index, scrollPane, speed=0.1, isVertical=true) {
+    if (!scrollPane || scrollPane.scrollTop == null) throw "scrollPane parameter requires a DOM element with scrollTop property";
+    clearInterval( this.movingInterval );
+    var _temp = Number.NEGATIVE_INFINITY;
+    var dir = (isVertical) ? "scrollTop" : "scrollLeft";
+
+    this.movingInterval = setInterval( () => {
+      var target = this.getStepAt(index);
+      var d = (target.p1 + target.size/4) * speed;
+      scrollPane[dir] += d;
+      if (Math.abs(d)<1 || _temp === scrollPane[dir]) clearInterval(this.movingInterval);
+      _temp = scrollPane[dir];
+    }, 17);
+  }
+
+
+  /**
    * A convenient static function to create a step object
    * @param size chunk size
    * @param pad optional padding (default to 0)
@@ -136,6 +162,44 @@ class Roll extends EventEmitter {
    */
   static stepName( step, currStep, prev="prev", next="next", match="curr") {
     return (step === currStep) ? match : ( (step < currStep) ? prev : next );
+  }
+
+
+  /**
+   * Static helper for vertical scrolling
+   * @param viewPortID id of viewport element, eg, "#viewport"
+   * @param viewPaneID id of view pane element, eg, "#pane"
+   * @param viewClass id of each step or slide element, eg, ".step"
+   * @param pad optional padding between steps. Defaults to 0.
+   * @returns the roll instance which you can listen for "step" and "roll" event via `roll.on(...)`
+   */
+  static verticalScroller( viewPortID, viewPaneID, viewClass, pad=0 ) {
+
+    var viewport = document.querySelector( viewPortID );
+    var viewpane = document.querySelector( viewPaneID );
+    var views = document.querySelectorAll( viewClass );
+
+    if (!viewport || !viewpane) throw `Cannot find ${viewPortID} or ${viewPaneID} element id.`
+    if (!viewClass) throw `Cannot find ${viewClass} element class name`;
+
+    // create roll instance based on viewport element height
+    var roll = new Roll( viewport.getBoundingClientRect().height );
+
+    // add each viewClass element as a step
+    for (var i = 0; i < views.length; i++) {
+      var rect = views[i].getBoundingClientRect();
+      roll.addStep( Roll.chunk( rect.height, pad ) );
+    }
+
+    // update viewpane height based on steps
+    viewpane.style.height = roll.getHeight()+"px";
+
+    // track scroll
+    viewport.addEventListener("scroll", function(evt) {
+      roll.move( viewport.scrollTop );
+    });
+
+    return roll;
   }
 
 }
