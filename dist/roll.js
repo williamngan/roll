@@ -382,7 +382,6 @@ var Roll = (function (_EventEmitter) {
         }
       }
 
-      console.log(this.steps);
       return this;
     }
   }, {

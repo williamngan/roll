@@ -41,7 +41,6 @@ class Roll extends EventEmitter {
       d = st.p2 + st.pad;
     }
 
-    console.log( this.steps );
     return this;
   }
 
