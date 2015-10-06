@@ -7,6 +7,9 @@ var browserify = require('browserify');
 var watchify = require('watchify');
 var babel = require('babelify');
 
+var rename = require('gulp-rename');
+var uglify = require('gulp-uglify');
+
 
 // Define Paths
 var path = {
@@ -54,6 +57,15 @@ function compile(watch) {
 function watch() {
   return compile(true);
 }
+
+
+gulp.task('min', function() {
+  return gulp.src( "./dist/roll.js" )
+    .pipe( rename('roll.min.js') )
+    .pipe( uglify() )
+    .pipe( gulp.dest( "./dist" ) )
+
+});
 
 gulp.task('build', function() { return compile(); });
 gulp.task('watch', function() { return watch(); });
