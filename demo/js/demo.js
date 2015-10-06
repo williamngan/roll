@@ -43,4 +43,16 @@
   });
 
 
+  var scrollInterval = -1;
+  window.goto = function(index) {
+    clearInterval( scrollInterval );
+    scrollInterval = setInterval( function() {
+      var target = roll.getStepAt(index);
+      var d = (target.p1 + target.size/4)/10;
+      if (Math.abs(d)<1) clearInterval(scrollInterval);
+      viewport.scrollTop += d;
+    }, 17);
+
+  }
+
 })();

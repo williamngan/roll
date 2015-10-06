@@ -43,6 +43,11 @@ class Roll extends EventEmitter {
   }
 
 
+  getStepAt( index ) {
+    return this.steps[ Math.max( 0, Math.min( this.steps.length-1, index) )];
+  }
+
+
   /**
    * Calculate and return current step. When padding > 0, step will be -1 when current progress is on the padding area. This allows you to check progress against padding.
    * @returns {number}
