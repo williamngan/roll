@@ -1,13 +1,16 @@
-$h: 400px;
+html, body {
+  overflow: hidden;
+}
 
 #roll {
 
-  width: 80%;
-  height: $h;
-
-
   position: relative;
+  width: 500px;
+  height: 500px;
 
+  // Roll's size can also be defined by absolute positions.
+  //position: absolute;
+  //top: 0; bottom: 0; left: 0; right: 0;
 
   #wrapper {
     overflow: auto;
@@ -23,38 +26,36 @@ $h: 400px;
   #steps {
     position: absolute;
     overflow: hidden;
-    top: 0; left: 0;
-    width: 90%;
-    height: 100%;
-    //top: 0; bottom: 0; left: 0; right: 0;
-    //
-    //overflow-y: hidden;
-    //overflow-x: visible;
-  }
-
-  .step {
-    width: 100%;
-    height: $h;
-
-    position: absolute;
-    top: $h;
+    top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
 
-    background: rgba(244, 0, 0, .1);
+    .step {
+      width: 100%;
+      height: 100%;
 
-    transition: top .5s;
+      position: absolute;
+      top: 100%;
+      left: 0;
 
-    &.prev {
-      top: -$h;
+      background: rgba(244, 0, 0, .1);
+
+      transition: top .5s;
+
+      &.prev {
+        top: -100%;
+      }
+
+      &.next {
+        top: 100%;
+      }
+
+      &.curr {
+        top: 0;
+      }
     }
 
-    &.next {
-      top: $h;
-    }
-
-    &.curr {
-      top: 0;
-    }
   }
 
 }

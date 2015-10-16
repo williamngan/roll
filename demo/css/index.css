@@ -1,7 +1,10 @@
+html, body {
+  overflow: hidden; }
+
 #roll {
-  width: 80%;
-  height: 400px;
-  position: relative; }
+  position: relative;
+  width: 500px;
+  height: 500px; }
   #roll #wrapper {
     overflow: auto;
     border: 1px solid #f00;
@@ -14,19 +17,19 @@
     overflow: hidden;
     top: 0;
     left: 0;
-    width: 90%;
-    height: 100%; }
-  #roll .step {
     width: 100%;
-    height: 400px;
-    position: absolute;
-    top: 400px;
-    left: 0;
-    background: rgba(244, 0, 0, 0.1);
-    transition: top .5s; }
-    #roll .step.prev {
-      top: -400px; }
-    #roll .step.next {
-      top: 400px; }
-    #roll .step.curr {
-      top: 0; }
+    height: 100%; }
+    #roll #steps .step {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: rgba(244, 0, 0, 0.1);
+      transition: top .5s; }
+      #roll #steps .step.prev {
+        top: -100%; }
+      #roll #steps .step.next {
+        top: 100%; }
+      #roll #steps .step.curr {
+        top: 0; }

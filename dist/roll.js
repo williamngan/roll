@@ -306,13 +306,19 @@ function isUndefined(arg) {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x8, _x9, _x10) { var _again = true; _function: while (_again) { var object = _x8, property = _x9, receiver = _x10; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x8 = parent; _x9 = property; _x10 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x11, _x12, _x13) { var _again = true; _function: while (_again) { var object = _x11, property = _x12, receiver = _x13; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x11 = parent; _x12 = property; _x13 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var EventEmitter = require('events').EventEmitter;
+
+/**
+ * Roll simply keep tracks of steps' positions inside a viewport.
+ * Apart from the static helper functions and the `scroll` function, a roll instance doesn't depend on DOM manipulation.
+ * That means you can use a Roll instance in contexts other than DOM.
+ */
 
 var Roll = (function (_EventEmitter) {
   _inherits(Roll, _EventEmitter);
@@ -416,6 +422,16 @@ var Roll = (function (_EventEmitter) {
     }
 
     /**
+     * Get viewport's height (same as this.viewport)
+     * @returns {*}
+     */
+  }, {
+    key: "getViewportHeight",
+    value: function getViewportHeight() {
+      return this.viewport;
+    }
+
+    /**
      * Move the roll. This will emit two events `roll(step, currProgress, totalProgress)` and `step(curr, last)`
      * @param pos new position
      * @returns {Roll}
@@ -438,7 +454,7 @@ var Roll = (function (_EventEmitter) {
       this.emit("roll", curr, progress, this.current + Math.min(1, Math.max(0, progress)));
 
       if (curr != this.last && curr >= 0) {
-        this.emit("step", curr, this.last);
+        this.emit("step", curr, this.last, this.viewport);
         this.last = curr;
       }
 
@@ -497,9 +513,9 @@ var Roll = (function (_EventEmitter) {
      * A convenient static function to compare a step with current step, and transform it to a name
      * @param step the step to check
      * @param currStep current step
-     * @param prev the name if step is < currStep. Defaults to "prev"
-     * @param next the name if step is > currStep. Defaults to "next"
-     * @param match the name if step = currStep. Defaults to "curr"
+     * @param prev optional class name for step is < currStep. Defaults to "prev"
+     * @param next optional class name for step is > currStep. Defaults to "next"
+     * @param match optional class name for step = currStep. Defaults to "curr"
      * @returns {string}
      */
   }, {
@@ -513,21 +529,48 @@ var Roll = (function (_EventEmitter) {
     }
 
     /**
-     * Static helper for vertical scrolling
-     * @param viewPortID id of viewport element, eg, "#viewport"
+     * Static helper to get a handle function for Roll's "step" event. The handler function will add class names to each step element based on current step value.
+     * @param roll a Roll instance
+     * @param views a list of DOM elements which are the steps
+     * @param prev optional class name for step is < currStep. Defaults to "prev"
+     * @param next optional class name for step is > currStep. Defaults to "next"
+     * @param match optional class name for step = currStep. Defaults to "curr"
+     * @returns {Function}
+     */
+  }, {
+    key: "stepHandler",
+    value: function stepHandler(roll, views) {
+      var prev = arguments.length <= 2 || arguments[2] === undefined ? "prev" : arguments[2];
+      var next = arguments.length <= 3 || arguments[3] === undefined ? "next" : arguments[3];
+      var match = arguments.length <= 4 || arguments[4] === undefined ? "curr" : arguments[4];
+
+      return function (curr, last, viewportHeight) {
+        for (var i = 0; i < roll.steps.length; i++) {
+          var cls = Roll.stepName(i, curr, prev, next, match);
+          views[i].className = "step " + cls;
+          views[i].style.top = Roll.stepName(i, curr, -viewportHeight, viewportHeight, 0) + "px";
+        }
+      };
+    }
+
+    /**
+     * Static method to create a Roll instance with DOM elements
+     * @param viewPortID id of viewport element, which is the parent of the viewPane. eg, "#viewport"
      * @param viewPaneID id of view pane element, eg, "#pane"
+     * @param viewBox id of view box element, which is the parent the viewClass elements. eg, "#steps"
      * @param viewClass id of each step or slide element, eg, ".step"
      * @param pad optional padding between steps. Defaults to 0.
      * @returns the roll instance which you can listen for "step" and "roll" event via `roll.on(...)`
      */
   }, {
-    key: "verticalScroller",
-    value: function verticalScroller(viewPortID, viewPaneID, viewClass) {
-      var pad = arguments.length <= 3 || arguments[3] === undefined ? 0 : arguments[3];
+    key: "DOM",
+    value: function DOM(viewPortID, viewPaneID, viewBoxID, viewClass) {
+      var pad = arguments.length <= 4 || arguments[4] === undefined ? 0 : arguments[4];
 
       var viewport = document.querySelector(viewPortID);
-      var viewpane = document.querySelector(viewPaneID);
-      var views = document.querySelectorAll(viewClass);
+      var viewpane = viewport.querySelector(viewPaneID);
+      var viewbox = document.querySelector(viewBoxID);
+      var views = viewbox.querySelectorAll(viewClass);
 
       if (!viewport || !viewpane) throw "Cannot find " + viewPortID + " or " + viewPaneID + " element id.";
       if (!viewClass) throw "Cannot find " + viewClass + " element class name";
@@ -543,6 +586,9 @@ var Roll = (function (_EventEmitter) {
 
       // update viewpane height based on steps
       viewpane.style.height = roll.getHeight() + "px";
+
+      // update viewbox width to account for scrollbar
+      viewbox.style.width = viewpane.getBoundingClientRect().width + "px";
 
       // track scroll
       viewport.addEventListener("scroll", function (evt) {

@@ -1,5 +1,10 @@
 var EventEmitter = require('events').EventEmitter;
 
+/**
+ * Roll simply keep tracks of steps' positions inside a viewport.
+ * Apart from the static helper functions and the `scroll` function, a roll instance doesn't depend on DOM manipulation.
+ * That means you can use a Roll instance in contexts other than DOM.
+ */
 class Roll extends EventEmitter {
 
   /**
@@ -88,6 +93,14 @@ class Roll extends EventEmitter {
     return this.steps.reduce( (a,b) => a+b.size+b.pad, 0 );
   }
 
+  /**
+   * Get viewport's height (same as this.viewport)
+   * @returns {*}
+   */
+  getViewportHeight() {
+    return this.viewport;
+  }
+
 
   /**
    * Move the roll. This will emit two events `roll(step, currProgress, totalProgress)` and `step(curr, last)`
@@ -110,7 +123,7 @@ class Roll extends EventEmitter {
     this.emit("roll", curr, progress, this.current+Math.min( 1, Math.max(0, progress)) );
 
     if (curr != this.last && curr >= 0) {
-      this.emit("step", curr, this.last );
+      this.emit("step", curr, this.last, this.viewport );
       this.last = curr;
     }
 
@@ -156,13 +169,14 @@ class Roll extends EventEmitter {
     }
   }
 
+
   /**
    * A convenient static function to compare a step with current step, and transform it to a name
    * @param step the step to check
    * @param currStep current step
-   * @param prev the name if step is < currStep. Defaults to "prev"
-   * @param next the name if step is > currStep. Defaults to "next"
-   * @param match the name if step = currStep. Defaults to "curr"
+   * @param prev optional class name for step is < currStep. Defaults to "prev"
+   * @param next optional class name for step is > currStep. Defaults to "next"
+   * @param match optional class name for step = currStep. Defaults to "curr"
    * @returns {string}
    */
   static stepName( step, currStep, prev="prev", next="next", match="curr") {
@@ -171,18 +185,40 @@ class Roll extends EventEmitter {
 
 
   /**
-   * Static helper for vertical scrolling
-   * @param viewPortID id of viewport element, eg, "#viewport"
+   * Static helper to get a handle function for Roll's "step" event. The handler function will add class names to each step element based on current step value.
+   * @param roll a Roll instance
+   * @param views a list of DOM elements which are the steps
+   * @param prev optional class name for step is < currStep. Defaults to "prev"
+   * @param next optional class name for step is > currStep. Defaults to "next"
+   * @param match optional class name for step = currStep. Defaults to "curr"
+   * @returns {Function}
+   */
+  static stepHandler( roll, views, prev="prev", next="next", match="curr") {
+    return function ( curr, last, viewportHeight ) {
+      for (var i = 0; i < roll.steps.length; i++) {
+        var cls = Roll.stepName( i, curr, prev, next, match );
+        views[i].className = "step " + cls;
+        views[i].style.top = Roll.stepName( i, curr, -viewportHeight, viewportHeight, 0) +"px";
+      }
+    }
+  }
+
+
+  /**
+   * Static method to create a Roll instance with DOM elements
+   * @param viewPortID id of viewport element, which is the parent of the viewPane. eg, "#viewport"
    * @param viewPaneID id of view pane element, eg, "#pane"
+   * @param viewBox id of view box element, which is the parent the viewClass elements. eg, "#steps"
    * @param viewClass id of each step or slide element, eg, ".step"
    * @param pad optional padding between steps. Defaults to 0.
    * @returns the roll instance which you can listen for "step" and "roll" event via `roll.on(...)`
    */
-  static verticalScroller( viewPortID, viewPaneID, viewClass, pad=0 ) {
+  static DOM( viewPortID, viewPaneID, viewBoxID, viewClass, pad=0 ) {
 
     var viewport = document.querySelector( viewPortID );
-    var viewpane = document.querySelector( viewPaneID );
-    var views = document.querySelectorAll( viewClass );
+    var viewpane = viewport.querySelector( viewPaneID );
+    var viewbox = document.querySelector( viewBoxID );
+    var views = viewbox.querySelectorAll( viewClass );
 
     if (!viewport || !viewpane) throw `Cannot find ${viewPortID} or ${viewPaneID} element id.`
     if (!viewClass) throw `Cannot find ${viewClass} element class name`;
@@ -198,6 +234,9 @@ class Roll extends EventEmitter {
 
     // update viewpane height based on steps
     viewpane.style.height = roll.getHeight()+"px";
+
+    // update viewbox width to account for scrollbar
+    viewbox.style.width = viewpane.getBoundingClientRect().width+"px";
 
     // track scroll
     viewport.addEventListener("scroll", function(evt) {
