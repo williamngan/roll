@@ -35,7 +35,8 @@ class Roll extends EventEmitter {
     }
 
     var d=null;
-    for (var st of this.steps) {
+    for (var i=0; i<this.steps.length; i++) {
+      let st = this.steps[i];
       st.p1 = (d==null) ? st.p1 : d;
       st.p2 = st.p1 + st.size;
       d = st.p2 + st.pad;
@@ -45,6 +46,10 @@ class Roll extends EventEmitter {
   }
 
 
+  /**
+   * Get step by index
+   * @param index
+   */
   getStepAt( index ) {
     return this.steps[ Math.max( 0, Math.min( this.steps.length-1, index) )];
   }
@@ -94,7 +99,8 @@ class Roll extends EventEmitter {
     this.pos = -pos;
     var diff = this.pos - last;
 
-    for (var s of this.steps) {
+    for (var i=0; i<this.steps.length; i++) {
+      let s = this.steps[i]
       s.p1 += diff;
       s.p2 = s.p1 + s.size;
     }

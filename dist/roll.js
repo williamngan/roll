@@ -355,35 +355,20 @@ var Roll = (function (_EventEmitter) {
       }
 
       var d = null;
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = this.steps[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var st = _step.value;
-
-          st.p1 = d == null ? st.p1 : d;
-          st.p2 = st.p1 + st.size;
-          d = st.p2 + st.pad;
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"]) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+      for (var i = 0; i < this.steps.length; i++) {
+        var st = this.steps[i];
+        st.p1 = d == null ? st.p1 : d;
+        st.p2 = st.p1 + st.size;
+        d = st.p2 + st.pad;
       }
 
       return this;
     }
+
+    /**
+     * Get step by index
+     * @param index
+     */
   }, {
     key: "getStepAt",
     value: function getStepAt(index) {
@@ -442,30 +427,10 @@ var Roll = (function (_EventEmitter) {
       this.pos = -pos;
       var diff = this.pos - last;
 
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = this.steps[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var s = _step2.value;
-
-          s.p1 += diff;
-          s.p2 = s.p1 + s.size;
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2["return"]) {
-            _iterator2["return"]();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
+      for (var i = 0; i < this.steps.length; i++) {
+        var s = this.steps[i];
+        s.p1 += diff;
+        s.p2 = s.p1 + s.size;
       }
 
       var curr = this.getCurrent();
