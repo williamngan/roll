@@ -9,9 +9,8 @@ html, body {
     overflow: auto;
     border: 1px solid #f00;
     width: 100%;
-    height: 100%; }
-    #roll #wrapper #pane {
-      position: relative; }
+    height: 100%;
+    position: relative; }
   #roll #steps {
     position: absolute;
     overflow: hidden;
