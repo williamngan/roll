@@ -34,18 +34,24 @@ class Roll extends EventEmitter {
    * @returns {Roll}
    */
   addStep(s) {
-    if (Array.isArray( s )) {
-      this.steps = this.steps.concat( s );
-    } else {
-      this.steps.push( s );
+
+    if (!Array.isArray(s)) {
+      s = [s];
     }
 
-    var d=null;
-    for (var i=0; i<this.steps.length; i++) {
-      let st = this.steps[i];
-      st.p1 = (d==null) ? st.p1 : d;
-      st.p2 = st.p1 + st.size;
-      d = st.p2 + st.pad;
+    // get last recorded step
+    var d = s[0].p1;
+    if (this.steps.length > 0 ) {
+      var last = this.steps[this.steps.length-1];
+      d = last.p2 + last.pad;
+    }
+
+    // append new steps
+    for (var i=0; i<s.length; i++) {
+      s[i].p1 = d;
+      s[i].p2 = s[i].p1 + s[i].size;
+      d = s[i].p2 + s[i].pad;
+      this.steps.push( s[i] );
     }
 
     // recalculate pane size
@@ -71,7 +77,7 @@ class Roll extends EventEmitter {
   getStep() {
     for (var i=0; i<this.steps.length; i++) {
       var st = this.steps[i];
-      if (st.p1 >= -this.viewportSize && st.p2 <= this.viewportSize ) {
+      if (st.p1 >= -this.viewportSize && st.p2 <= st.size ) {
         this.current = i;
         return i;
       }
@@ -206,12 +212,17 @@ class Roll extends EventEmitter {
    * @param match optional class name for step = currStep. Defaults to "curr"
    * @returns {Function}
    */
-  static stepHandler( roll, views, prev="prev", next="next", match="curr") {
+  static stepHandler( roll, views, prev="prev", next="next", match="curr", trackTopPos=false) {
     return function ( curr, last, viewportHeight ) {
       for (var i = 0; i < roll.steps.length; i++) {
         var cls = Roll.stepName( i, curr, prev, next, match );
         views[i].className = "step " + cls;
-        views[i].style.top = Roll.stepName( i, curr, -viewportHeight, viewportHeight, 0) +"px";
+
+        // if steps have different sizes, recalc top position and set style
+        if (trackTopPos) {
+          var p = (cls===prev) ?  roll.steps[i].size * -1 : ((cls===next) ? viewportHeight : 0);
+          views[i].style.top = p+"px";
+        }
       }
     }
   }
@@ -242,7 +253,6 @@ class Roll extends EventEmitter {
     // add each viewClass element as a step
     for (var i = 0; i < views.length; i++) {
       var rect = views[i].getBoundingClientRect();
-      console.log( rect.height, i);
       roll.addStep( Roll.chunk( rect.height, pad ) );
     }
 

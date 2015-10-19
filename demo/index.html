@@ -1,13 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+
+	<title>Roll.js Demos</title>
 	<script type="text/javascript" src="../dist/roll.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="./css/demo.css" />
+	<link rel="stylesheet" type="text/css" href="./css/demoStyles.css" />
+
+
 
 </head>
 <body>
+
+<div id="menu">
+	<h1>roll.js</h1>
+	<p>A tiny javascript library to track scrolling and stuff. </p>
+
+	<hr />
+
+	<p class="field"><span class="label">Current step</span><span class="value" id="currStep"></span></p>
+	<p class="field"><span class="label">Current step progress</span><span class="value" id="currStepProgress"></span></p>
+	<p class="field"><span class="label">Current position</span><span class="value" id="currPos"></span></p>
+	<p class="field"><span class="label">Total progress</span><span class="value" id="totalProgress"></span></p>
+
+	<hr />
+	<p class="field"><span class="label">Steps</span><span class="value" id="numSteps"></span></p>
+	<p class="field"><span class="label">Viewport height</span><span class="value" id="viewportHeight"></span></p>
+	<p class="field"><span class="label">Roll height</span><span class="value" id="paneHeight"></span></p>
+	<p class="field"><span class="label">Padding between steps</span><span class="value" id="padding">100px</span></p>
+
+	<hr />
+	<p class="field"><span class="label">Jump to</span>
+		<span id="numSteps">
+			<a href="#" onclick="goto(1)">step 2</a> &nbsp;
+			<a href="#" onclick="goto(3)">step 4</a>
+		</span>
+	</p>
+</div>
 
 
 <div id="roll">
@@ -26,7 +57,7 @@
 
 <div id="progress"></div>
 
-<div><a href="#" onclick="goto(0)">step 1</a> <a href="#" onclick="goto(1)">step 2</a> <a href="#" onclick="goto(2)">step 3</a> <a href="#" onclick="goto(3)">step 4</a> <a href="#" onclick="goto(4)">step 5</a></div>
+<div id="github"><a href="#">Source code</a></div>
 
 <script type="text/javascript" src="./js/demo.js"></script>
 

@@ -11,13 +11,29 @@
   function track() {
 
     // when a step is changed
-    roll.on( "step", Roll.stepHandler( roll, views ) );
+    roll.on( "step", Roll.stepHandler( roll, views, "prev", "next", "curr", true ) );
 
     // when scrolling, just print some debugging info in an element
     roll.on( "roll", function ( step, stepProgress, position, totalProgress ) {
-      var curr = (step >= 0) ? "Step "+step : "(padding)";
-      var str = curr + " at " + Math.floor( stepProgress * 100 ) + "% (total: " + Math.floor( totalProgress * 100) + "%, at " + position+ "px)";
-      document.querySelector( "#progress" ).textContent = str;
+      var curr = (step >= 0) ? "Step "+(step+1) : "(padding)";
+
+      var vals = {
+        numSteps: roll.steps.length,
+        viewportHeight: roll.getViewportHeight(),
+        paneHeight: roll.getHeight(),
+        currStep: curr,
+        currPos: position + "px",
+        currStepProgress: Math.floor( stepProgress * 100 ) + "%",
+        totalProgress: Math.floor( totalProgress * 100) + "%"
+      };
+
+      for (var k in vals) {
+        var el = document.querySelector("#"+k);
+        if (el) {
+          el.textContent = vals[k];
+        }
+      }
+
     } );
   }
 
@@ -35,6 +51,9 @@
   window.addEventListener("resize", function(evt) {
     roll = Roll.DOM( "#wrapper", "#pane", "#steps", ".step", 100 );
     track();
+    goto(0);
   });
+
+  goto(0);
 
 })();

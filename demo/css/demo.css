@@ -41,8 +41,6 @@ html, body {
   height: 100%;
   position: relative;
 
-  /* optional style */
-  border: 1px solid #f00;
 }
 
 
@@ -58,6 +56,7 @@ html, body {
   height: 100%;
 }
 
+
 .step {
   width: 100%;
   height: 100%;
@@ -66,8 +65,7 @@ html, body {
   top: 100%;
   left: 0;
 
-  /* optional style */
-  background: rgba(244, 0, 0, .1);
+  /* optional transition */
   transition: top .5s;
 }
 

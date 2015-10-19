@@ -306,7 +306,7 @@ function isUndefined(arg) {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x12, _x13, _x14) { var _again = true; _function: while (_again) { var object = _x12, property = _x13, receiver = _x14; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x12 = parent; _x13 = property; _x14 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x13, _x14, _x15) { var _again = true; _function: while (_again) { var object = _x13, property = _x14, receiver = _x15; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x13 = parent; _x14 = property; _x15 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -355,18 +355,24 @@ var Roll = (function (_EventEmitter) {
   _createClass(Roll, [{
     key: "addStep",
     value: function addStep(s) {
-      if (Array.isArray(s)) {
-        this.steps = this.steps.concat(s);
-      } else {
-        this.steps.push(s);
+
+      if (!Array.isArray(s)) {
+        s = [s];
       }
 
-      var d = null;
-      for (var i = 0; i < this.steps.length; i++) {
-        var st = this.steps[i];
-        st.p1 = d == null ? st.p1 : d;
-        st.p2 = st.p1 + st.size;
-        d = st.p2 + st.pad;
+      // get last recorded step
+      var d = s[0].p1;
+      if (this.steps.length > 0) {
+        var last = this.steps[this.steps.length - 1];
+        d = last.p2 + last.pad;
+      }
+
+      // append new steps
+      for (var i = 0; i < s.length; i++) {
+        s[i].p1 = d;
+        s[i].p2 = s[i].p1 + s[i].size;
+        d = s[i].p2 + s[i].pad;
+        this.steps.push(s[i]);
       }
 
       // recalculate pane size
@@ -394,7 +400,7 @@ var Roll = (function (_EventEmitter) {
     value: function getStep() {
       for (var i = 0; i < this.steps.length; i++) {
         var st = this.steps[i];
-        if (st.p1 >= -this.viewportSize && st.p2 <= this.viewportSize) {
+        if (st.p1 >= -this.viewportSize && st.p2 <= st.size) {
           this.current = i;
           return i;
         }
@@ -560,12 +566,18 @@ var Roll = (function (_EventEmitter) {
       var prev = arguments.length <= 2 || arguments[2] === undefined ? "prev" : arguments[2];
       var next = arguments.length <= 3 || arguments[3] === undefined ? "next" : arguments[3];
       var match = arguments.length <= 4 || arguments[4] === undefined ? "curr" : arguments[4];
+      var trackTopPos = arguments.length <= 5 || arguments[5] === undefined ? false : arguments[5];
 
       return function (curr, last, viewportHeight) {
         for (var i = 0; i < roll.steps.length; i++) {
           var cls = Roll.stepName(i, curr, prev, next, match);
           views[i].className = "step " + cls;
-          views[i].style.top = Roll.stepName(i, curr, -viewportHeight, viewportHeight, 0) + "px";
+
+          // if steps have different sizes, recalc top position and set style
+          if (trackTopPos) {
+            var p = cls === prev ? roll.steps[i].size * -1 : cls === next ? viewportHeight : 0;
+            views[i].style.top = p + "px";
+          }
         }
       };
     }
@@ -598,7 +610,6 @@ var Roll = (function (_EventEmitter) {
       // add each viewClass element as a step
       for (var i = 0; i < views.length; i++) {
         var rect = views[i].getBoundingClientRect();
-        console.log(rect.height, i);
         roll.addStep(Roll.chunk(rect.height, pad));
       }
 
