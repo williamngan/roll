@@ -306,7 +306,7 @@ function isUndefined(arg) {
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _get = function get(_x11, _x12, _x13) { var _again = true; _function: while (_again) { var object = _x11, property = _x12, receiver = _x13; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x11 = parent; _x12 = property; _x13 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x12, _x13, _x14) { var _again = true; _function: while (_again) { var object = _x12, property = _x13, receiver = _x14; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x12 = parent; _x13 = property; _x14 = receiver; _again = true; continue _function; } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -333,7 +333,8 @@ var Roll = (function (_EventEmitter) {
 
     _get(Object.getPrototypeOf(Roll.prototype), "constructor", this).call(this);
 
-    this.viewport = viewSize;
+    this.viewportSize = viewSize;
+    this.paneSize = 0;
 
     // store the steps object {y1, y2, size, pad}, See Roll.chunk
     this.steps = [];
@@ -368,6 +369,9 @@ var Roll = (function (_EventEmitter) {
         d = st.p2 + st.pad;
       }
 
+      // recalculate pane size
+      this.getHeight(true);
+
       return this;
     }
 
@@ -386,11 +390,11 @@ var Roll = (function (_EventEmitter) {
      * @returns {number}
      */
   }, {
-    key: "getCurrent",
-    value: function getCurrent() {
+    key: "getStep",
+    value: function getStep() {
       for (var i = 0; i < this.steps.length; i++) {
         var st = this.steps[i];
-        if (st.p1 >= -this.viewport && st.p2 <= this.viewport) {
+        if (st.p1 >= -this.viewportSize && st.p2 <= this.viewportSize) {
           this.current = i;
           return i;
         }
@@ -403,10 +407,20 @@ var Roll = (function (_EventEmitter) {
      * @returns 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
      */
   }, {
-    key: "getCurrentProgress",
-    value: function getCurrentProgress() {
+    key: "getStepProgress",
+    value: function getStepProgress() {
       var curr = this.steps[this.current];
       return 1 - curr.p2 / curr.size;
+    }
+
+    /**
+     * Get current position
+     * @returns {number|*}
+     */
+  }, {
+    key: "getPosition",
+    value: function getPosition() {
+      return this.pos;
     }
 
     /**
@@ -416,19 +430,22 @@ var Roll = (function (_EventEmitter) {
   }, {
     key: "getHeight",
     value: function getHeight() {
-      return this.steps.reduce(function (a, b) {
+      var recalc = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+      if (recalc) this.paneSize = this.steps.reduce(function (a, b) {
         return a + b.size + b.pad;
       }, 0);
+      return this.paneSize;
     }
 
     /**
-     * Get viewport's height (same as this.viewport)
+     * Get viewport's height (same as this.viewportSize)
      * @returns {*}
      */
   }, {
     key: "getViewportHeight",
     value: function getViewportHeight() {
-      return this.viewport;
+      return this.viewportSize;
     }
 
     /**
@@ -449,12 +466,12 @@ var Roll = (function (_EventEmitter) {
         s.p2 = s.p1 + s.size;
       }
 
-      var curr = this.getCurrent();
-      var progress = this.getCurrentProgress();
-      this.emit("roll", curr, progress, this.current + Math.min(1, Math.max(0, progress)));
+      var curr = this.getStep();
+      var progress = this.getStepProgress();
+      this.emit("roll", curr, progress, pos, pos / (this.paneSize - this.viewportSize));
 
       if (curr != this.last && curr >= 0) {
-        this.emit("step", curr, this.last, this.viewport);
+        this.emit("step", curr, this.last, this.viewportSize);
         this.last = curr;
       }
 
@@ -581,6 +598,7 @@ var Roll = (function (_EventEmitter) {
       // add each viewClass element as a step
       for (var i = 0; i < views.length; i++) {
         var rect = views[i].getBoundingClientRect();
+        console.log(rect.height, i);
         roll.addStep(Roll.chunk(rect.height, pad));
       }
 

@@ -14,9 +14,9 @@
     roll.on( "step", Roll.stepHandler( roll, views ) );
 
     // when scrolling, just print some debugging info in an element
-    roll.on( "roll", function ( step, progress, total ) {
-      var curr = (step >= 0) ? step : "(padding)";
-      var str = "Step " + curr + " at " + Math.floor( progress * 100 ) + "% (total: " + total + ")";
+    roll.on( "roll", function ( step, stepProgress, position, totalProgress ) {
+      var curr = (step >= 0) ? "Step "+step : "(padding)";
+      var str = curr + " at " + Math.floor( stepProgress * 100 ) + "% (total: " + Math.floor( totalProgress * 100) + "%, at " + position+ "px)";
       document.querySelector( "#progress" ).textContent = str;
     } );
   }

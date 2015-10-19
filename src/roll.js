@@ -14,7 +14,8 @@ class Roll extends EventEmitter {
   constructor( viewSize ) {
     super();
 
-    this.viewport = viewSize;
+    this.viewportSize = viewSize;
+    this.paneSize = 0;
 
     // store the steps object {y1, y2, size, pad}, See Roll.chunk
     this.steps = [];
@@ -47,6 +48,9 @@ class Roll extends EventEmitter {
       d = st.p2 + st.pad;
     }
 
+    // recalculate pane size
+    this.getHeight( true );
+
     return this;
   }
 
@@ -64,10 +68,10 @@ class Roll extends EventEmitter {
    * Calculate and return current step. When padding > 0, step will be -1 when current progress is on the padding area. This allows you to check progress against padding.
    * @returns {number}
    */
-  getCurrent() {
+  getStep() {
     for (var i=0; i<this.steps.length; i++) {
       var st = this.steps[i];
-      if (st.p1 >= -this.viewport && st.p2 <= this.viewport ) {
+      if (st.p1 >= -this.viewportSize && st.p2 <= this.viewportSize ) {
         this.current = i;
         return i;
       }
@@ -79,26 +83,35 @@ class Roll extends EventEmitter {
    * Get current progress within the current step
    * @returns 0-1 if step.pad is 0. Otherwise it will range from negative to positive.
    */
-  getCurrentProgress() {
+  getStepProgress() {
     var curr = this.steps[ this.current ];
     return 1 - (curr.p2 / curr.size);
   }
 
 
   /**
-   * Get total height of the pane (including padding)
-   * @returns {*}
+   * Get current position
+   * @returns {number|*}
    */
-  getHeight() {
-    return this.steps.reduce( (a,b) => a+b.size+b.pad, 0 );
+  getPosition() {
+    return this.pos;
   }
 
   /**
-   * Get viewport's height (same as this.viewport)
+   * Get total height of the pane (including padding)
+   * @returns {*}
+   */
+  getHeight( recalc = false ) {
+    if (recalc ) this.paneSize = this.steps.reduce( (a,b) => a+b.size+b.pad, 0 );
+    return this.paneSize;
+  }
+
+  /**
+   * Get viewport's height (same as this.viewportSize)
    * @returns {*}
    */
   getViewportHeight() {
-    return this.viewport;
+    return this.viewportSize;
   }
 
 
@@ -113,17 +126,17 @@ class Roll extends EventEmitter {
     var diff = this.pos - last;
 
     for (var i=0; i<this.steps.length; i++) {
-      let s = this.steps[i]
+      let s = this.steps[i];
       s.p1 += diff;
       s.p2 = s.p1 + s.size;
     }
 
-    var curr = this.getCurrent();
-    var progress = this.getCurrentProgress();
-    this.emit("roll", curr, progress, this.current+Math.min( 1, Math.max(0, progress)) );
+    var curr = this.getStep();
+    var progress = this.getStepProgress();
+    this.emit("roll", curr, progress, pos, pos/(this.paneSize-this.viewportSize) );
 
     if (curr != this.last && curr >= 0) {
-      this.emit("step", curr, this.last, this.viewport );
+      this.emit("step", curr, this.last, this.viewportSize );
       this.last = curr;
     }
 
@@ -229,6 +242,7 @@ class Roll extends EventEmitter {
     // add each viewClass element as a step
     for (var i = 0; i < views.length; i++) {
       var rect = views[i].getBoundingClientRect();
+      console.log( rect.height, i);
       roll.addStep( Roll.chunk( rect.height, pad ) );
     }
 

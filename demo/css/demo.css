@@ -1,0 +1,90 @@
+/**
+This is a sample css file scrolling DOM elements using roll.js.
+The DOM structure usually looks like this
+
+<div id="roll">
+	<div id="steps">
+		<div id="s0" class="step">One</div>
+		<div id="s1" class="step">Two</div>
+		<div id="s2" class="step">Three</div>
+		<div id="s3" class="step">etc...</div>
+	</div>
+	<div id="wrapper">
+		<div id="pane"></div>
+	</div>
+</div>
+*/
+
+
+html, body {
+  /* optional */
+  overflow: hidden;
+}
+
+#roll {
+
+  position: relative;
+  width: 500px;
+  height: 500px;
+
+  /*
+    Roll's size can also be defined by absolute positions.
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+  */
+}
+
+
+#wrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  /* optional style */
+  border: 1px solid #f00;
+}
+
+
+#pane {}
+
+
+#steps {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.step {
+  width: 100%;
+  height: 100%;
+
+  position: absolute;
+  top: 100%;
+  left: 0;
+
+  /* optional style */
+  background: rgba(244, 0, 0, .1);
+  transition: top .5s;
+}
+
+
+/* what's the styles for previous steps */
+.step.prev {
+  top: -100%;
+}
+
+
+/* what's the styles for next steps */
+.step.next {
+  top: 100%;
+}
+
+
+/* what's the styles for current steps */
+.step.curr {
+  top: 0;
+}
