@@ -34,7 +34,15 @@
         }
       }
 
-    } );
+      var currStep = document.querySelector("#s"+step);
+      var ings = currStep.querySelectorAll(".ingredient");
+      for (var i=0; i<ings.length; i++) {
+        var ang1 = parseInt( ings[i].getAttribute("data-angle") );
+        var ang2 = parseInt( ings[i].getAttribute("data-rotate") );
+        ings[i].style.transform = "rotate("+(ang1 + (stepProgress) * ang2 )+"deg) scale("+(0.25+totalProgress*0.5)+")";
+      }
+
+    });
   }
 
   // start tracking

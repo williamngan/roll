@@ -1,6 +1,5 @@
 html, body {
   overflow: hidden;
-  background: #e03845;
   margin: 0;
   font: 10px/1.5 "Montserrat", sans-serif; }
 
@@ -11,12 +10,8 @@ html, body {
   left: 0;
   width: 300px;
   bottom: 0;
-  box-sizing: border-box; }
-
-#github {
-  position: fixed;
-  top: 20px;
-  right: 40px; }
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.1); }
 
 h1 {
   font-size: 5em;
@@ -24,7 +19,8 @@ h1 {
   color: #fff; }
 
 p {
-  font-size: 1.2em; }
+  font-size: 1.2em;
+  color: #fff; }
   p.field {
     line-height: 20px;
     clear: right; }
@@ -40,27 +36,40 @@ p {
 
 hr {
   border: none;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.1);
   margin: 30px 0; }
 
 a {
   display: inline-block;
-  color: #fff;
-  border-bottom: 1px solid #fff;
+  color: #ff0;
+  border-bottom: 1px solid rgba(255, 255, 0, 0);
   text-decoration: none; }
   a:hover {
-    border-bottom-color: #ff0; }
+    border-bottom-color: yellow; }
 
 #roll {
   background: url(../images/nori.png) repeat;
   position: absolute;
   top: 0;
-  left: 300px;
+  left: 0px;
   bottom: 0;
   right: 0;
   width: auto;
   height: auto; }
 
 .step {
-  font-size: 10em;
-  color: #fff; }
+  color: #fff;
+  opacity: 1;
+  transition: top .5s, opacity .5s; }
+  .step h1 {
+    margin-top: 30px;
+    font-size: 30vh;
+    width: 100%;
+    text-align: right;
+    position: absolute;
+    color: #000;
+    line-height: 1;
+    letter-spacing: -0.03em; }
+
+.step.prev, .step.next {
+  opacity: 0; }

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script type="text/javascript" src="../dist/roll.js"></script>
+    <script type="text/javascript" src="./js/pt-core.min.js"></script>
+
+    <style type="text/css">
+        #pt {
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="pt"></div>
+
+
+<script>
+    (function() {
+
+        var space = new CanvasSpace("demo", "#eee" ).display("#pt");
+        var form = new Form( space );
+
+        var rect1 = new Rectangle().to(space.size.$divide(2));
+        var rect2 = new Rectangle();
+
+        space.add( {
+            animate: function ( time, fps, context ) {
+
+                form.fill("#ddd" ).rect( rect1);
+            },
+
+            onMouseAction: function ( type, x, y, evt ) {
+                if (type == "move") { // mouse moved
+
+                }
+            }
+        });
+
+        space.play();
+    })();
+</script>
+
+</body>
+</html>
