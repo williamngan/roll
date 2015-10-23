@@ -8,40 +8,130 @@
     <script type="text/javascript" src="./js/pt-core.min.js"></script>
 
     <style type="text/css">
+
+        body {
+            font: 14px/1.5 "Helvetica Neue", Arial, sans-serif;
+            font-weight: 500;
+            color: #334057;
+            padding: 50px;
+        }
+
         #pt {
             width: 500px;
             height: 500px;
         }
+        #info {
+            position: absolute;
+            top: 50px;
+            left: 600px;
+        }
+
+        a {
+            color: #42dc8e;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #2e43eb;
+        }
+
     </style>
 
 </head>
 <body>
 
-<div id="pt"></div>
 
+
+<div id="info">
+    <h1>Using <a href="https://github.com/williamngan/roll">roll.js</a> in html canvas.</h1>
+    <p id="step">&larr; Move the mouse around on the canvas to start.</p>
+    <p id="currProgress"></p>
+    <p id="currPosition"></p>
+    <p id="totalProgress"></p>
+    <p id="direction"></p>
+    <p></p>
+</div>
+
+<div>
+    <div id="pt"></div>
+    <p><a href="#">Demo source code</a> &middot; Made with <a href="http:/williamngan.github.io/pt">Pt</a></p>
+</div>
 
 <script>
     (function() {
 
-        var space = new CanvasSpace("demo", "#eee" ).display("#pt");
+        // set up pt.js space
+        var space = new CanvasSpace( "demo", "#def" ).display( "#pt" );
         var form = new Form( space );
 
-        var rect1 = new Rectangle().to(space.size.$divide(2));
-        var rect2 = new Rectangle();
+        // set up viewport rectangle and pane rectangle
+        var offset = space.size.$divide( 4 );
+        var viewport = new Rectangle( offset ).to( space.size.$divide( 2 ).add( offset ) );
+        var viewH = viewport.size().y;
+        var rollPadding = 20; // padding between steps
+        var pane = new Rectangle( offset ).to( new Vector( offset.x * 2, viewH * 5 + rollPadding * 4 ).add( offset ) );
 
+        // create roll instance
+        var roll = new Roll( viewH );
+
+        // add 4 steps to roll
+        roll.addStep( Roll.chunk( viewH, rollPadding ) );
+        roll.addStep( Roll.chunk( viewH * 2, rollPadding ) );
+        roll.addStep( Roll.chunk( viewH, rollPadding ) );
+        roll.addStep( Roll.chunk( viewH, rollPadding ) );
+
+        // listen for roll event
+        roll.on( "roll", function ( step, currProgress, currPosition, totalProgress ) {
+            // print out current values
+            document.querySelector( "#step" ).textContent = "Step " + ((step >= 0) ? step : "(padding)");
+            document.querySelector( "#currProgress" ).textContent = "Current progress " + Math.floor( currProgress * 100 ) + "%";
+            document.querySelector( "#currPosition" ).textContent = "Current position at " + Math.floor( currPosition ) + "px";
+            document.querySelector( "#totalProgress" ).textContent = "Total progress " + Math.floor( totalProgress * 100 ) + "%";
+        } );
+
+        // listen for step event
+        roll.on( "step", function ( curr, last ) {
+            document.querySelector( "#direction" ).textContent = "Changed to " + ( (curr > last) ? "next step" : "previous step" );
+        } );
+
+        // add an animate object to Pt's space
         space.add( {
             animate: function ( time, fps, context ) {
 
-                form.fill("#ddd" ).rect( rect1);
+                // draw pane and viewport rectangles
+                form.stroke( false );
+
+                form.fill( "rgba(255, 227, 89, .9)" ).rect( pane );
+                form.fill( "#42dc8e" ).rect( viewport );
+
+                // draw steps
+                for (var i = 0; i < roll.steps.length; i++) {
+
+                    // a step is an object with {p1, p2, size, pad}
+                    var s = roll.steps[i];
+
+                    // convert to Pt rectangle
+                    var slide = new Rectangle( offset.x, s.p1 + offset.y ).to( offset.x * 3, s.p2 + offset.y );
+                    form.fill( false ).stroke( "#fff", 5 ).rect( slide );
+                    form.fill("rgba(255,255,255,.5" ).font(50 ).text( slide.$add(20, 60), i )
+                }
             },
 
+            // track mouse
             onMouseAction: function ( type, x, y, evt ) {
                 if (type == "move") { // mouse moved
 
+                    // simulate scrolling by mouse movement
+                    var d = pane.size().$subtract( viewport.size() ).$divide( space.size );
+                    pane.moveTo( pane.x, offset.y - y * d.y );
+
+                    // trigger a move (like scrolling)
+                    roll.move( -pane.y + offset.y );
                 }
             }
-        });
+        } );
 
+        space.bindMouse();
         space.play();
     })();
 </script>

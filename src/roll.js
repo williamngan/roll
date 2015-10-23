@@ -30,7 +30,7 @@ class Roll extends EventEmitter {
 
   /**
    * Add a step object. You can also use Roll.chunk() static helper function to create a step object easily.
-   * @param s an object with {y1, y2, size, pad} properties, or an array of steps object
+   * @param s an object with {p1, p2, size, pad} properties, or an array of steps object
    * @returns {Roll}
    */
   addStep(s) {
@@ -122,7 +122,7 @@ class Roll extends EventEmitter {
 
 
   /**
-   * Move the roll. This will emit two events `roll(step, currProgress, totalProgress)` and `step(curr, last)`
+   * Move the roll. This will emit two events `roll(step, currProgress, currPosition, totalProgress)` and `step(curr, last)`
    * @param pos new position
    * @returns {Roll}
    */
