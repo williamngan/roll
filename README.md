@@ -8,7 +8,7 @@ Nothing too fancy, but since I couldn't find a suitable library for these purpos
 ## Demo
 Here's a **[DOM scrolling demo](http://williamngan.github.io/roll/demo/index.html)** (with some weird iPhone paintings :satisfied:)
 
-Here's a **[Canvas demo](http://williamngan.github.io/roll/demo/index.html)**
+Here's a **[Canvas demo](http://williamngan.github.io/roll/demo/canvas.html)**
 
 ## Basic Usage
 
