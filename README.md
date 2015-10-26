@@ -3,7 +3,8 @@
 ![roll.js demo](http://williamngan.github.io/roll/demo/images/demo.png)
 
 A little js library (~8kb, no dependencies) to help you keep track of position, scrolling, and pagination.
-Nothing too fancy, but since I couldn't find a suitable library for these purposes, I made one for a friend and myself and you too.
+Nothing too fancy, but since I couldn't find a suitable library for these purposes, I made one for a friend and myself and you too!
+Ping me [@williamngan](http://twitter.com/williamngan) if you have questions or comments.
 
 ## Demo
 Here's a **[DOM scrolling demo](http://williamngan.github.io/roll/demo/index.html)** (with some weird iPhone paintings :satisfied:)
@@ -63,7 +64,7 @@ The html structure for a *scrolling slideshow* may look like this. Also see a [s
 
 Then this will keep track of vertical scrolling in the #viewport DOM element. You can then listen for the `roll` and `step` events as shown in Basic Usage, and implement your own logic.
 
-One more thing: `Roll.stepHandler(...)` is a helper for handling `step` event. It will add css classes to the `.step` elements based on which step is in view.
+One more thing: `Roll.stepHandler(...)` is a helper to go through a slideshow with `step` event. It will add css classes to the `.step` elements based on which step is in view.
 
 ```javascript
 roll.on( "step", Roll.stepHandler( roll, views, "prev", "next", "curr", true ) );
@@ -73,4 +74,7 @@ In the above snippet, `roll` is the roll instance, `views` is an array of the .s
 
 A good way to get started is to take a look at the demos above, and then check out the source code in [demo folder](https://github.com/williamngan/roll/tree/master/demo).
 
-Enjoy! Ping me [@williamngan](http://twitter.com/williamngan) if you have questions or comments.
+## Compiling
+
+This library is written in javascript ES6 and compiled with Babel. If you want to change the source code and rebuild, simply `npm install` to get the dev dependencies,
+and then run `gulp` to watch and build.
