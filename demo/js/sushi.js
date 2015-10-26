@@ -28,9 +28,7 @@
     var vs = ["webkit", "Webkit", "Moz", "ms"];
     for (var i=0; i<vs.length; i++) {
       elem.style[ vs[i]+prop ] = val;
-      console.log( vs[i]+prop );
     }
-    console.log( elem.style );
   }
 
   function addIngredients( ings, parent ) {
