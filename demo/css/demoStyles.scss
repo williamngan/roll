@@ -13,6 +13,12 @@ html, body {
   background: rgba(255,255,255,.1);
 }
 
+#progress {
+  position: absolute;
+  top: 0; left: 300px;
+  width: 1px; height: 0;
+  background: #ff0;
+}
 
 h1 {
   font-size: 5em;
@@ -88,7 +94,7 @@ a {
   h1 {
     top: 30px;
     right: 30px;
-    font-size: 30vh;
+    font-size: 40vh;
     width: 100%;
     text-align: right;
     position: absolute;

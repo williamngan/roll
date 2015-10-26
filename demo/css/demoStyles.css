@@ -13,6 +13,14 @@ html, body {
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.1); }
 
+#progress {
+  position: absolute;
+  top: 0;
+  left: 300px;
+  width: 1px;
+  height: 0;
+  background: #ff0; }
+
 h1 {
   font-size: 5em;
   margin: 0 0 20px;
@@ -64,7 +72,7 @@ a {
   .step h1 {
     top: 30px;
     right: 30px;
-    font-size: 30vh;
+    font-size: 40vh;
     width: 100%;
     text-align: right;
     position: absolute;

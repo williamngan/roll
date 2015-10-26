@@ -54,6 +54,9 @@
         }
       }
 
+      var progress = document.querySelector("#progress");
+      progress.style.height = Math.floor(roll.getViewportHeight() * totalProgress) + "px";
+
     });
   }
 

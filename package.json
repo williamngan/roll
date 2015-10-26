@@ -1,7 +1,7 @@
 {
   "name": "rolljs",
-  "version": "0.1.0",
-  "description": "Roll with scroll - a simple library to track scrolling",
+  "version": "0.1.1",
+  "description": "A simple library to track scroll movements.",
   "author": "William Ngan",
   "devDependencies": {
     "event-stream": "^3.3.0",
