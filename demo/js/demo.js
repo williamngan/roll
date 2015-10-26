@@ -10,6 +10,14 @@
   // define how you want to track the elements as you scroll
   function track() {
 
+    // vendor prefix for old browsers
+    function _vendor( elem, prop, val ) {
+      var vs = ["webkit", "Webkit", "Moz", "ms"];
+      for (var i=0; i<vs.length; i++) {
+        elem.style[ vs[i]+prop ] = val;
+      }
+    }
+
     // when a step is changed
     roll.on( "step", Roll.stepHandler( roll, views, "prev", "next", "curr", true ) );
 
@@ -40,7 +48,9 @@
         for (var i = 0; i < ings.length; i++) {
           var ang1 = parseInt( ings[i].getAttribute( "data-angle" ) );
           var ang2 = parseInt( ings[i].getAttribute( "data-rotate" ) );
-          ings[i].style.transform = "rotate(" + (ang1 + (stepProgress) * ang2 ) + "deg) scale(" + (0.25 + totalProgress * 0.5) + ")";
+          var tm = "rotate(" + (ang1 + (stepProgress) * ang2 ) + "deg) scale(" + (0.25 + totalProgress * 0.5) + ")";
+          ings[i].style.transform = tm;
+          _vendor( ings[i], "Transform", tm );
         }
       }
 

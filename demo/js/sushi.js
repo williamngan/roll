@@ -6,14 +6,11 @@
     {name: "rice1", w: 317, h: 358},
     {name: "rice2", w: 318, h: 200},
     {name: "wasabi1", w: 88, h: 101},
-    {name: "wasabi2", w: 108, h: 55},
-    {name: "wasabi3", w: 108, h: 90},
-    {name: "negitoro", w: 418, h: 438},
+    //{name: "wasabi2", w: 108, h: 55},
+    //{name: "wasabi3", w: 108, h: 90},
+    //{name: "negitoro", w: 418, h: 438},
     {name: "ebi1", w: 322, h: 729},
-    {name: "ebi1", w: 322, h: 729},
-    {name: "ikura1", w: 382, h: 400},
     {name: "ikura1", w: 382, h: 400}
-
   ];
 
 
@@ -31,7 +28,9 @@
     var vs = ["webkit", "Webkit", "Moz", "ms"];
     for (var i=0; i<vs.length; i++) {
       elem.style[ vs[i]+prop ] = val;
+      console.log( vs[i]+prop );
     }
+    console.log( elem.style );
   }
 
   function addIngredients( ings, parent ) {
