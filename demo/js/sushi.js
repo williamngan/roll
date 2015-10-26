@@ -19,13 +19,20 @@
 
   function getIngredients() {
     var ings = [];
-    for (var i=0; i<8; i++) {
+    for (var i=0; i<6; i++) {
       var dice = Math.floor(Math.random()*stuff.length);
       ings.push( stuff[dice] );
     }
     return ings;
   }
 
+
+  function _vendor( elem, prop, val ) {
+    var vs = ["webkit", "Webkit", "Moz", "ms"];
+    for (var i=0; i<vs.length; i++) {
+      elem.style[ vs[i]+prop ] = val;
+    }
+  }
 
   function addIngredients( ings, parent ) {
     var rect = parent.getBoundingClientRect();
@@ -41,7 +48,11 @@
       ing.style.top = Math.floor(Math.random()*rect.height) + "px";
       var ang = Math.floor(Math.random()*360);
       var ang2 = Math.floor(Math.random()*90) - Math.floor(Math.random()*90);
-      ing.style.transform = "rotate("+ang+"deg) scale(0.5)";
+
+      var tm = "rotate("+ang+"deg) scale(0.5)";
+      ing.style.transform = tm;
+      _vendor( ing, "Transform", tm );
+
       ing.setAttribute("data-angle", ang);
       ing.setAttribute("data-rotate", ang2);
       ing.className = "ingredient";
@@ -54,7 +65,6 @@
   for (var i=0; i<5; i++) {
     var elem = document.querySelector("#s"+i);
     var ings = getIngredients();
-    console.log( elem, ings );
     addIngredients( ings, elem );
   }
 
