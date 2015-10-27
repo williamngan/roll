@@ -48,7 +48,8 @@
         for (var i = 0; i < ings.length; i++) {
           var ang1 = parseInt( ings[i].getAttribute( "data-angle" ) );
           var ang2 = parseInt( ings[i].getAttribute( "data-rotate" ) );
-          var tm = "rotate(" + (ang1 + (stepProgress) * ang2 ) + "deg) scale(" + (0.25 + totalProgress * 0.5) + ")";
+          //var tm = "rotate(" + (ang1 + (stepProgress*0.2) * ang2 ) + "deg) scale(" + (0.25 + totalProgress * 0.5) + ")";
+          var tm = "scale(" + (0.25 + totalProgress * 0.5) + ") translate(0, "+Math.floor(-ang1*stepProgress*3)+"px)";
           ings[i].style.transform = tm;
           _vendor( ings[i], "Transform", tm );
         }

@@ -56,7 +56,7 @@ a {
     border-bottom-color: yellow; }
 
 #roll {
-  background: url(../images/nori.png) repeat;
+  background: #5CD;
   position: absolute;
   top: 0;
   left: 0px;
@@ -76,7 +76,7 @@ a {
     width: 100%;
     text-align: right;
     position: absolute;
-    color: #000;
+    color: rgba(0, 0, 0, 0.1);
     line-height: 1;
     letter-spacing: -0.03em; }
 
