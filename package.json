@@ -1,6 +1,6 @@
 {
   "name": "rolljs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A simple library to track scroll movements.",
   "author": "William Ngan",
   "devDependencies": {
@@ -20,7 +20,7 @@
     "babelify": "6.3.0",
     "events": "^1.1.0"
   },
-  "main": "dist/js/roll.js",
+  "main": "dist/module/roll.js",
   "directories": {
     "doc": "docs",
     "test": "test"

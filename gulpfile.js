@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var gulpbabel = require('gulp-babel');
 var gutil = require('gulp-util');
 var sourcemaps = require('gulp-sourcemaps');
 var source = require('vinyl-source-stream');
@@ -32,7 +33,7 @@ function handleError( error ) {
 
 
 function compile(watch) {
-  var bundler = watchify(browserify('./src/roll.js', { debug: true }).transform(babel));
+  var bundler = watchify(browserify('./src/roll_standalone.js', { debug: true }).transform(babel));
 
   function rebundle() {
     bundler.bundle()
@@ -67,23 +68,14 @@ gulp.task('min', function() {
 
 });
 
+gulp.task('module', function () {
+    return gulp.src('./src/roll.js')
+        .pipe(gulpbabel())
+        .pipe(gulp.dest('./dist/module'));
+});
+
 gulp.task('build', function() { return compile(); });
 gulp.task('watch', function() { return watch(); });
 
 gulp.task('default', ['watch']);
 
-/*
-gulp.task('default', ["watch"]);
-
-// Watch
-gulp.task('watch', function() {
-  gulp.watch( path.src.js+"/*.js", ['es6']);
-});
-
-// ES6 Babel
-gulp.task('es6', function () {
-    return gulp.src( path.src.js+"*.js" )
-        .pipe(babel({ modules: "common"})).on('error', handleError)
-        .pipe(gulp.dest( path.dist.js ));
-});
-*/

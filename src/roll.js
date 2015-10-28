@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter;
  * Apart from the static helper functions and the `scroll` function, a roll instance doesn't depend on DOM manipulation.
  * That means you can use a Roll instance in contexts other than DOM.
  */
-class Roll extends EventEmitter {
+export default class Roll extends EventEmitter {
 
   /**
    * Create a new Roll.
@@ -271,7 +271,3 @@ class Roll extends EventEmitter {
   }
 
 }
-
-
-module.exports = Roll;
-if (window) window.Roll = Roll;
