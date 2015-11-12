@@ -2,7 +2,7 @@
 
 ![roll.js demo](http://williamngan.github.io/roll/demo/images/demo.png)
 
-A little js library (~8kb, no dependencies) to help you keep track of position, scrolling, and pagination.
+A little js library (~8kb min, 3kb gzip, no dependencies) to help you keep track of position, scrolling, and pagination.
 Nothing too fancy, but since I couldn't find a suitable library for these purposes, I made one for a friend and myself and you too!
 Ping me [@williamngan](http://twitter.com/williamngan) if you have questions or comments.
 
