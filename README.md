@@ -78,3 +78,6 @@ A good way to get started is to take a look at the demos above, and then check o
 
 This library is written in javascript ES6 and compiled with Babel. If you want to change the source code and rebuild, simply `npm install` to get the dev dependencies,
 and then run `gulp` to watch and build.
+
+## NPM
+[https://www.npmjs.com/package/rolljs](https://www.npmjs.com/package/rolljs) 
