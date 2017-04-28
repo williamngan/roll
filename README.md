@@ -1,5 +1,7 @@
 # roll.js
 
+[![CDNJS](https://img.shields.io/cdnjs/v/roll.svg)](https://cdnjs.com/libraries/roll)
+
 ![roll.js demo](http://williamngan.github.io/roll/demo/images/demo.png)
 
 A little js library (~8kb min, 3kb gzip, no dependencies) to help you keep track of position, scrolling, and pagination.
